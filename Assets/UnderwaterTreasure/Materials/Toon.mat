@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Toon 1
+  m_Name: Toon
   m_Shader: {fileID: -6465566751694194690, guid: 330202832afdd224593e7c8e8843e35a, type: 3}
   m_Parent: {fileID: -876546973899608171, guid: 330202832afdd224593e7c8e8843e35a, type: 3}
   m_ModifiedSerializedProperties: 0
@@ -26,15 +26,13 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Attenuation: 0
     - _QueueControl: 0
-    - _Smoothnes: 0.4
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 0}
-    - _ShadderColor: {r: 0, g: 0.37955475, b: 1, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadderColor: {r: 0.40087974, g: 0.109803915, b: 0.9254902, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &3809157330129389084
+--- !u!114 &4812652105011096971
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

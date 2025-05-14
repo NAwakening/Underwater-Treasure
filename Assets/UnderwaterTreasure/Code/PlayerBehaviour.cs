@@ -152,4 +152,9 @@ public class PlayerBehaviour : MonoBehaviour
             }
         }
     }
+
+    public bool GetIsInvisible
+    {
+        get { return isInvisible; }
+    }
 }
