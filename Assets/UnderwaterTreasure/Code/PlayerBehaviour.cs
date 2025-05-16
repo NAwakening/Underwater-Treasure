@@ -18,6 +18,7 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField] Transform bulletpos;
     [SerializeField] float bulletSpeed;
     [SerializeField] float jumpPower;
+    [SerializeField] Transform respawnPos;
 
     Vector3 direction;
     Vector2 input;
@@ -59,6 +60,14 @@ public class PlayerBehaviour : MonoBehaviour
         if (collision.collider.CompareTag("ground"))
         {
             canJump = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("OutOfBounds"))
+        {
+            transform.position = respawnPos.position;
         }
     }
 
