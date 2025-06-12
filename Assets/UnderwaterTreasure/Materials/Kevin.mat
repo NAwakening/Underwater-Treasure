@@ -29,6 +29,8 @@ Material:
     - _QueueControl: 0
     - _fresnel_Power: 4
     - _gradiant: 0.5
+    - _offset: 0.4
+    - _speed: 1
     m_Colors:
     - _Color: {r: 0.011712074, g: 0, b: 1, a: 1}
     - _Color_1: {r: 0, g: 0, b: 0, a: 0}

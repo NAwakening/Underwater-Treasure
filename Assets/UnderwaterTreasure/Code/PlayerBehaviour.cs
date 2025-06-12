@@ -19,6 +19,7 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField] float bulletSpeed;
     [SerializeField] float jumpPower;
     [SerializeField] Transform respawnPos;
+    [SerializeField] UIManager manager;
 
     Vector3 direction;
     Vector2 input;
@@ -37,22 +38,25 @@ public class PlayerBehaviour : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (isMoving)
+        if (!manager.GetGameEnded)
         {
-            orientation.forward = (transform.position - new Vector3(_camera.position.x, transform.position.y, _camera.position.z)).normalized;
-            direction = (input.x * orientation.right + input.y * orientation.forward);
-            playerTransform.forward = Vector3.Slerp(playerTransform.forward, direction.normalized, rotSpeed * Time.fixedDeltaTime);
-            if (new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude > speed)
+            if (isMoving)
             {
-                Vector3 limitedVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).normalized * speed;
-                rb.linearVelocity = new Vector3 (limitedVel.x, rb.linearVelocity.y, limitedVel.z);
+                orientation.forward = (transform.position - new Vector3(_camera.position.x, transform.position.y, _camera.position.z)).normalized;
+                direction = (input.x * orientation.right + input.y * orientation.forward);
+                playerTransform.forward = Vector3.Slerp(playerTransform.forward, direction.normalized, rotSpeed * Time.fixedDeltaTime);
+                if (new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude > speed)
+                {
+                    Vector3 limitedVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).normalized * speed;
+                    rb.linearVelocity = new Vector3(limitedVel.x, rb.linearVelocity.y, limitedVel.z);
+                }
             }
+            else
+            {
+                direction = Vector3.zero;
+            }
+            rb.AddForce(direction.normalized * speed, ForceMode.Force);
         }
-        else
-        {
-            direction = Vector3.zero;
-        }
-        rb.AddForce(direction.normalized * speed, ForceMode.Force);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -69,94 +73,113 @@ public class PlayerBehaviour : MonoBehaviour
         {
             transform.position = respawnPos.position;
         }
+
+        if (other.CompareTag("End"))
+        {
+            manager.EndGame();
+        }
     }
 
     public void OnMove(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (!manager.GetGameEnded)
         {
-            input = value.ReadValue<Vector2>();
-            isMoving = true;
-            anim.SetBool("isWalking", true);
+            if (value.performed)
+            {
+                input = value.ReadValue<Vector2>();
+                isMoving = true;
+                anim.SetBool("isWalking", true);
+            }
+            else if (value.canceled)
+            {
+                direction = new Vector3(0, rb.linearVelocity.y, 0);
+                isMoving = false;
+                anim.SetBool("isWalking", false);
+            }
         }
-        else if (value.canceled)
-        {
-            direction = new Vector3 (0, rb.linearVelocity.y, 0);
-            isMoving = false;
-            anim.SetBool("isWalking", false);
-        }
-        
     }
 
     public void OnHologram(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (!manager.GetGameEnded)
         {
-            Material[] newMaterials = playerRenderer.materials;
-            if (!isInHologram)
+            if (value.performed)
             {
-                newMaterials[0] = materials[1];
-                isInHologram = true;
-                isInvisible = false;
-                gameObject.layer = 8;
+                Material[] newMaterials = playerRenderer.materials;
+                if (!isInHologram)
+                {
+                    newMaterials[0] = materials[1];
+                    isInHologram = true;
+                    isInvisible = false;
+                    gameObject.layer = 8;
+                }
+                else
+                {
+                    newMaterials[0] = materials[0];
+                    isInHologram = false;
+                    gameObject.layer = 0;
+                }
+                playerRenderer.materials = newMaterials;
             }
-            else
-            {
-                newMaterials[0] = materials[0];
-                isInHologram = false;
-                gameObject.layer = 0;
-            }
-            playerRenderer.materials = newMaterials;
         }
     }
 
     public void OnInvisible(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (!manager.GetGameEnded)
         {
-            Material[] newMaterials = playerRenderer.materials;
-            if (!isInvisible)
+            if (value.performed)
             {
-                newMaterials[0] = materials[2];
-                isInHologram = false;
-                isInvisible = true;
-                gameObject.layer = 0;
+                Material[] newMaterials = playerRenderer.materials;
+                if (!isInvisible)
+                {
+                    newMaterials[0] = materials[2];
+                    isInHologram = false;
+                    isInvisible = true;
+                    gameObject.layer = 0;
+                }
+                else
+                {
+                    newMaterials[0] = materials[0];
+                    isInvisible = false;
+                }
+                playerRenderer.materials = newMaterials;
             }
-            else
-            {
-                newMaterials[0] = materials[0];
-                isInvisible = false;
-            }
-            playerRenderer.materials = newMaterials;
         }
     }
 
     public void OnJump(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (!manager.GetGameEnded)
         {
-            if (canJump)
+            if (value.performed)
             {
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-                rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
-                canJump = false;
+                if (canJump)
+                {
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+                    rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+                    canJump = false;
+                }
+
             }
-            
         }
     }
 
     public void OnFire(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (!manager.GetGameEnded)
         {
-            for (int i = 0; i < bullets.Length; i++)
+            if (value.performed)
             {
-                if (!bullets[i].activeSelf)
+                for (int i = 0; i < bullets.Length; i++)
                 {
-                    bullets[i].SetActive(true);
-                    bullets[i].transform.position = bulletpos.position;
-                    bullets[i].GetComponent<Rigidbody>().AddForce(playerTransform.forward * bulletSpeed, ForceMode.Force);
-                    break;
+                    if (!bullets[i].activeSelf)
+                    {
+                        bullets[i].SetActive(true);
+                        bullets[i].transform.position = bulletpos.position;
+                        bullets[i].GetComponent<Rigidbody>().AddForce(playerTransform.forward * bulletSpeed, ForceMode.Force);
+                        break;
+                    }
                 }
             }
         }

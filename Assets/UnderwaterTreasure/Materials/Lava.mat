@@ -42,6 +42,7 @@ Material:
     - _AngleOffset: 6
     - _IslandDensity: 80
     - _Normal_Strength: 0.2
+    - _QueueControl: 0
     - _RotAngleSpeed: 1
     m_Colors:
     - _LavaColor: {r: 0, g: 1.8396959, b: 4, a: 0}
